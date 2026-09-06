@@ -129,6 +129,9 @@ class InputView(
     private val keyboardWindow: KeyboardWindow by instance()
     private val liquidWindow: LiquidWindow by instance()
 
+    /** Lets an IME interaction session restore a concrete keyboard without exposing DI. */
+    fun switchKeyboard(to: String) = keyboardWindow.switchKeyboard(to)
+
     private val candidatesMode by AppPrefs.defaultInstance().candidates.mode
 
     private val keyboardSidePadding = theme.generalStyle.keyboardPadding

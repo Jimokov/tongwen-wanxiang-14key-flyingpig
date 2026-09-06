@@ -189,11 +189,16 @@ class CommonKeyboardActionListener(override val di: DI) : DIAware {
                     "apply" -> handleApplyCommand(arg)
                     "share_text" -> service.shareText()
                     "select_candidate" -> handleSelectCandidate(arg)
+                    "enter_14key_selection" ->
+                        service.enterFourteenKeySelection(currentKeyboardId(), arg)
+                    "cancel_14key_selection" -> service.cancelFourteenKeySelection()
                     "switch_hide_key_symbol" -> switchHideKeySymbol()
                     "switch_hide_key_hint" -> switchHideKeyHint()
                     else -> handleIntentAction(action.command, arg)
                 }
             }
+
+            private fun currentKeyboardId(): String = keyboardWindow.currentKeyboardId()
 
             private fun handleLiquidKeyboard(arg: String) {
                 // for compatibility

@@ -265,6 +265,9 @@ class KeyboardWindow(di: DI) :
         Timber.d("Switched to keyboard: $target")
     }
 
+    /** The concrete layout currently shown, for temporary modal keyboard sessions. */
+    fun currentKeyboardId(): String = currentKeyboardId
+
     fun refreshKeyboards(isAll: Boolean = false) {
         val id = currentKeyboardId.ifEmpty { return }
         detachCurrentView()

@@ -48,6 +48,7 @@ import com.osfans.trime.data.theme.ColorManager
 import com.osfans.trime.data.theme.ThemeManager
 import com.osfans.trime.data.theme.ThemeScope
 import com.osfans.trime.ime.composition.CandidatesView
+import com.osfans.trime.ime.keyboard.FourteenKeySelectionSession
 import com.osfans.trime.ime.keyboard.InputFeedbackManager
 import com.osfans.trime.receiver.RimeIntentReceiver
 import com.osfans.trime.util.any
@@ -93,6 +94,8 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
     private var lastCommittedText: String = ""
 
     private var composingText: String = ""
+
+    private val fourteenKeySelection = FourteenKeySelectionSession()
 
     private var cursorUpdateIndex = 0
 
@@ -215,6 +218,9 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
             is RimeMessage.CommitTextMessage -> {
                 if (!it.data.text.isNullOrEmpty()) {
                     commitText(it.data.text)
+                    fourteenKeySelection.complete()?.let { returnKeyboard ->
+                        inputView?.switchKeyboard(returnKeyboard)
+                    }
                 }
             }
             is RimeMessage.InlinePreeditMessage -> {
@@ -605,6 +611,36 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
         lastCommittedText = text
         composingText = ""
         InputFeedbackManager.textCommitSpeak(text)
+    }
+
+    /**
+     * Enters Wanxiang's reverse-lookup mode without asking a 14-key user to type `.
+     * The snapshot makes Cancel restore composition instead of deleting it.
+     */
+    fun enterFourteenKeySelection(
+        returnKeyboard: String,
+        selectionKeyboard: String,
+    ) {
+        postRimeJob {
+            val rawInput = getRawInput()
+            if (rawInput.isBlank() || !hasMenu) return@postRimeJob
+            if (!fourteenKeySelection.begin(returnKeyboard, rawInput)) return@postRimeJob
+            if (simulateKeySequence("`")) {
+                inputView?.switchKeyboard(selectionKeyboard)
+            } else {
+                fourteenKeySelection.clear()
+            }
+        }
+    }
+
+    /** Cancels lookup filters and reconstructs exactly the composition that preceded them. */
+    fun cancelFourteenKeySelection() {
+        val snapshot = fourteenKeySelection.cancel() ?: return
+        postRimeJob {
+            clearComposition()
+            simulateKeySequence(snapshot.rawInput)
+            inputView?.switchKeyboard(snapshot.returnKeyboard)
+        }
     }
 
     /**
