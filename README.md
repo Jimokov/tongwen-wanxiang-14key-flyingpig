@@ -4,7 +4,17 @@ SPDX-FileCopyrightText: 2015 - 2024 Rime community
 SPDX-License-Identifier: GPL-3.0-or-later
 -->
 
-# Trime
+# 同文·万象十四键
+
+> 正在设计与开发中的 Android Rime 定制版：将万象输入方案、经典 5 / 5 / 4 十四键布局与可独立切换的主题整合为一个可维护的项目。
+
+本仓库 Fork 自 [osfans/trime](https://github.com/osfans/trime)，保留上游代码与许可。项目决策和模块路线见：[设计决策](doc/wanxiang-14key-decisions.md) · [路线图](doc/wanxiang-14key-roadmap.md)。
+
+当前处于交互与方案架构阶段，尚未提供可安装版本。
+
+---
+
+# Upstream: Trime
 
 Rime IME for Android
 
