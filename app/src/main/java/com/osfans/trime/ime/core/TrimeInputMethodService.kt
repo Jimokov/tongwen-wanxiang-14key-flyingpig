@@ -648,6 +648,8 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
         }
     }
 
+    fun isFourteenKeySelectionActive(): Boolean = fourteenKeySelection.isActive
+
     /**
      * Starts a Wanxiang slash command in an unfurled 26-key layer.
      *

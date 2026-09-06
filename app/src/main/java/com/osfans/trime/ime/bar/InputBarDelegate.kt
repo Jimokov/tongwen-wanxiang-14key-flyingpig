@@ -69,6 +69,7 @@ class InputBarDelegate(override val di: DI) :
     private val theme: Theme get() = scope.theme
     private val windowManager: BoardWindowManager by instance()
     private val commonKeyboardActionListener: CommonKeyboardActionListener by instance()
+    private val keyboardWindow: KeyboardWindow by instance()
     private val candidate: CompactCandidateDelegate by instance()
     private val rime: RimeSession by instance()
 
@@ -170,7 +171,17 @@ class InputBarDelegate(override val di: DI) :
     }
 
     private val candidateUi by lazy {
-        CandidateUi(context, scope, candidate.view).apply {
+        CandidateUi(
+            context,
+            scope,
+            candidate.view,
+            onSelectCharacter = {
+                service.enterFourteenKeySelection(
+                    keyboardWindow.currentKeyboardId(),
+                    FOURTEEN_KEY_SELECTION_KEYBOARD,
+                )
+            },
+        ).apply {
             unrollButton.apply {
                 onSwipe = swipeDownHideKeyboardCallback
             }
@@ -222,10 +233,20 @@ class InputBarDelegate(override val di: DI) :
     }
 
     override fun onCandidateListUpdate(data: Candidates.Bulk) {
+        candidateUi.setSelectCharacterVisible(
+            data.candidates.isNotEmpty() &&
+                keyboardWindow.currentKeyboardId().contains("14") &&
+                keyboardWindow.hasKeyboard(FOURTEEN_KEY_SELECTION_KEYBOARD) &&
+                !service.isFourteenKeySelectionActive(),
+        )
         barStateMachine.push(
             QuickBarStateMachine.TransitionEvent.CandidatesUpdated,
             QuickBarStateMachine.BooleanKey.CandidateEmpty to data.candidates.isEmpty(),
         )
+    }
+
+    companion object {
+        private const val FOURTEEN_KEY_SELECTION_KEYBOARD = "wanxiang_14select"
     }
 
     private fun switchUiByState(state: QuickBarStateMachine.State) {

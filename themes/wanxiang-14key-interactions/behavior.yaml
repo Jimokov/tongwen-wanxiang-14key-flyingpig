@@ -1,0 +1,16 @@
+preset_keys:
+  Cancel14Select:
+    label: 取消
+    send: FUNCTION
+    command: cancel_14key_selection
+
+  RawCommand14:
+    label: '/'
+    send: FUNCTION
+    command: enter_14key_raw_command
+    option: wanxiang_14command
+
+  Cancel14Command:
+    label: 取消
+    send: FUNCTION
+    command: cancel_14key_raw_command

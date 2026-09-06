@@ -1,0 +1,62 @@
+preset_keyboards:
+  # Entered from the native candidate-bar 选字 button.  Letters below are the
+  # actual Wanxiang hspzn reverse-lookup conditions, not folded 14-key codes.
+  wanxiang_14select:
+    name: 十四键选字
+    ascii_mode: 0
+    lock: true
+    label_transform: uppercase
+    width: 20
+    keys:
+      - { click: '7', label: 一声, width: 25 }
+      - { click: '8', label: 二声, width: 25 }
+      - { click: '9', label: 三声, width: 25 }
+      - { click: '0', label: 四声, width: 25 }
+      - { click: h, label: 横, width: 20 }
+      - { click: s, label: 竖, width: 20 }
+      - { click: p, label: 撇, width: 20 }
+      - { click: n, label: 捺, width: 20 }
+      - { click: z, label: 折, width: 20 }
+      - { click: BackSpace, label: 退格, width: 50 }
+      - { click: Cancel14Select, width: 50 }
+
+  # This keyboard exists only while a / command is pending.  It gives Wanxiang
+  # unmodified 26-key input, so /rc and /flypy cannot be corrupted by folding.
+  wanxiang_14command:
+    name: 十四键命令
+    ascii_mode: 0
+    lock: true
+    label_transform: uppercase
+    width: 10
+    keys:
+      - { click: q }
+      - { click: w }
+      - { click: e }
+      - { click: r }
+      - { click: t }
+      - { click: y }
+      - { click: u }
+      - { click: i }
+      - { click: o }
+      - { click: p }
+      - { click: a, width: 11 }
+      - { click: s, width: 11 }
+      - { click: d, width: 11 }
+      - { click: f, width: 11 }
+      - { click: g, width: 11 }
+      - { click: h, width: 11 }
+      - { click: j, width: 11 }
+      - { click: k, width: 11 }
+      - { click: l, width: 11 }
+      - { click: BackSpace, label: 退格, width: 25 }
+      - { click: z, width: 11 }
+      - { click: x, width: 11 }
+      - { click: c, width: 11 }
+      - { click: v, width: 11 }
+      - { click: b, width: 11 }
+      - { click: n, width: 11 }
+      - { click: m, width: 11 }
+      - { click: '.', width: 11 }
+      - { click: Cancel14Command, width: 25 }
+      - { click: space, width: 50 }
+      - { click: Return, width: 50 }

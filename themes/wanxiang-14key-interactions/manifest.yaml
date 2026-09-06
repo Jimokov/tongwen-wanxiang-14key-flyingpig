@@ -1,0 +1,11 @@
+name: 万象十四键交互组件
+author: tongwen-wanxiang-14key
+version: "0.1.0"
+
+# This is an overlay for the Wanxiang 14-key base package, not a standalone
+# schema or dictionary distribution.  It deliberately contains no .gram model.
+components:
+  - behavior:
+      file: behavior.yaml
+  - keyboard:
+      file: keyboard.yaml

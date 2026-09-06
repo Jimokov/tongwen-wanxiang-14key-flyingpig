@@ -268,6 +268,8 @@ class KeyboardWindow(di: DI) :
     /** The concrete layout currently shown, for temporary modal keyboard sessions. */
     fun currentKeyboardId(): String = currentKeyboardId
 
+    fun hasKeyboard(id: String): Boolean = presetKeyboardIds.contains(id)
+
     fun refreshKeyboards(isAll: Boolean = false) {
         val id = currentKeyboardId.ifEmpty { return }
         detachCurrentView()
