@@ -54,6 +54,14 @@
     <string name="show_app_icon">Show app icon in launcher</string>
     <string name="browse_app_data_dir">Browse app data folder</string>
     <string name="browse_app_data_dir_failed">No file manager available to browse app data</string>
+    <string name="wanxiang_language_model">Wanxiang language model</string>
+    <string name="wanxiang_model_missing">Not installed. Import wanxiang-lts-zh-hans.gram; it is never bundled with the app or theme.</string>
+    <string name="wanxiang_model_needs_deploy">Imported. Deployment is required before Wanxiang can be used.</string>
+    <string name="wanxiang_model_ready_summary">Ready after deployment (%1$d MB)</string>
+    <string name="wanxiang_model_deploy_failed">Imported, but the last deployment failed. Tap to replace the model and deploy again.</string>
+    <string name="wanxiang_model_ready">Wanxiang language model is ready</string>
+    <string name="wanxiang_model_import_failed">Wanxiang language model import failed</string>
+    <string name="wanxiang_model_not_ready">Wanxiang cannot be enabled until its language model is imported and deployment succeeds.</string>
     <string name="only_available_on_some_roms">This option is only available on some ROMs</string>
     <string name="default_">Default</string>
     <string name="clipboard_limit">Clipboard history limit</string>

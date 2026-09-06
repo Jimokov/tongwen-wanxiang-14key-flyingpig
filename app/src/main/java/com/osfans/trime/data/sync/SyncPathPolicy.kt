@@ -5,6 +5,7 @@
 package com.osfans.trime.data.sync
 
 import com.osfans.trime.data.base.DataManager
+import com.osfans.trime.data.wanxiang.WanxiangLanguageModel
 import com.osfans.trime.util.yaml.Yaml
 import com.osfans.trime.util.yaml.mapping
 import com.osfans.trime.util.yaml.string
@@ -108,7 +109,10 @@ object SyncPathPolicy {
         ownId: String?,
         syncDir: String = DEFAULT_SYNC_DIR,
     ): Boolean {
-        if (relativePath == DataManager.INSTALLATION_FILE_NAME) return true
+        if (
+            relativePath == DataManager.INSTALLATION_FILE_NAME ||
+            relativePath == WanxiangLanguageModel.FILE_NAME
+        ) return true
         if (ownId.isNullOrEmpty()) return false
         return isOwnSyncPath(relativePath, ownId, syncDir)
     }

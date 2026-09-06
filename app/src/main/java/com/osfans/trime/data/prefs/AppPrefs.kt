@@ -374,6 +374,8 @@ class AppPrefs(
             const val LAST_BACKGROUND_SYNC_STATUS = "last_background_sync_status"
             const val LAST_BACKGROUND_SYNC_TIME = "last_background_sync_time"
             const val USER_DB_MIGRATED = "profile_user_db_migrated"
+            const val WANXIANG_MODEL_DEPLOYED_FINGERPRINT = "wanxiang_model_deployed_fingerprint"
+            const val WANXIANG_MODEL_FAILED_FINGERPRINT = "wanxiang_model_failed_fingerprint"
         }
 
         val dataStorageMode = enum(R.string.data_storage_mode, DATA_STORAGE_MODE, DataStorageMode.EXTERNAL_SYNC)
@@ -384,6 +386,8 @@ class AppPrefs(
         val periodicBackgroundSyncInterval = int(PERIODIC_BACKGROUND_SYNC_INTERVAL, 30)
         val lastBackgroundSyncStatus = bool(LAST_BACKGROUND_SYNC_STATUS, false)
         val lastBackgroundSyncTime = long(LAST_BACKGROUND_SYNC_TIME, 0L)
+        val wanxiangModelDeployedFingerprint = string(WANXIANG_MODEL_DEPLOYED_FINGERPRINT, "")
+        val wanxiangModelFailedFingerprint = string(WANXIANG_MODEL_FAILED_FINGERPRINT, "")
     }
 
     class Clipboard(

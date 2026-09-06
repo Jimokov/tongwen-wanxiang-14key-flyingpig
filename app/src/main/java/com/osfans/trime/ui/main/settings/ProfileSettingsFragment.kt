@@ -7,6 +7,7 @@ package com.osfans.trime.ui.main.settings
 
 import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
@@ -22,6 +23,7 @@ import com.osfans.trime.data.sync.DataStorageMode
 import com.osfans.trime.data.sync.RimeDataSync
 import com.osfans.trime.data.sync.SafDisplayPath
 import com.osfans.trime.data.sync.UserDbMigration
+import com.osfans.trime.data.wanxiang.WanxiangLanguageModel
 import com.osfans.trime.ui.common.PaddingPreferenceFragment
 import com.osfans.trime.ui.common.withLoadingDialog
 import com.osfans.trime.ui.main.MainViewModel
@@ -77,8 +79,51 @@ class ProfileSettingsFragment : PaddingPreferenceFragment() {
             handleTreePicked(uri, pendingPickerCancelToAppStorage)
         }
 
+    private val wanxiangModelPicker =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri == null) return@registerForActivityResult
+            lifecycleScope.launch {
+                withLoadingDialog(requireContext()) {
+                    runCatching {
+                        withContext(Dispatchers.IO) {
+                            require(wanxiangModelDisplayName(uri) == WanxiangLanguageModel.FILE_NAME) {
+                                "Expected ${WanxiangLanguageModel.FILE_NAME}"
+                            }
+                            requireNotNull(requireContext().contentResolver.openInputStream(uri))
+                                .use { WanxiangLanguageModel().install(it) }
+                            viewModel.rime.runOnReady { deploy(skipImport = true) }
+                        }
+                    }.onSuccess {
+                        updateWanxiangModelSummary()
+                        requireContext().toast(R.string.wanxiang_model_ready)
+                    }.onFailure {
+                        updateWanxiangModelSummary()
+                        requireContext().toast(R.string.wanxiang_model_import_failed)
+                    }
+                }
+            }
+        }
+
     private lateinit var editSyncIntervalPreference: EditTextIntPreference
     private lateinit var dataPathPreference: Preference
+
+    private fun wanxiangModelSummary(): String = when (val status = WanxiangLanguageModel().inspect()) {
+        WanxiangLanguageModel.Status.Missing -> getString(R.string.wanxiang_model_missing)
+        is WanxiangLanguageModel.Status.NeedsDeploy -> getString(R.string.wanxiang_model_needs_deploy)
+        is WanxiangLanguageModel.Status.Ready -> getString(R.string.wanxiang_model_ready_summary, status.file.bytes / (1024 * 1024))
+        is WanxiangLanguageModel.Status.Failed -> getString(R.string.wanxiang_model_deploy_failed)
+    }
+
+    private fun updateWanxiangModelSummary() {
+        findPreference<Preference>(WANXIANG_MODEL_PREFERENCE_KEY)?.summary = wanxiangModelSummary()
+    }
+
+    private fun wanxiangModelDisplayName(uri: Uri): String? =
+        requireContext().contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
+            ?.use { cursor ->
+                if (!cursor.moveToFirst()) return@use null
+                cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
+            }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -329,6 +374,18 @@ class ProfileSettingsFragment : PaddingPreferenceFragment() {
             addCategory(R.string.maintenance) {
                 isIconSpaceReserved = false
                 addPreference(
+                    Preference(ctx).apply {
+                        key = WANXIANG_MODEL_PREFERENCE_KEY
+                        isIconSpaceReserved = false
+                        setTitle(R.string.wanxiang_language_model)
+                        summary = wanxiangModelSummary()
+                        setOnPreferenceClickListener {
+                            wanxiangModelPicker.launch(arrayOf("application/octet-stream", "application/*"))
+                            true
+                        }
+                    },
+                )
+                addPreference(
                     title = getString(R.string.browse_app_data_dir),
                     summary = DataManager.userDataDir.absolutePath,
                 ) {
@@ -371,6 +428,7 @@ class ProfileSettingsFragment : PaddingPreferenceFragment() {
             }
         }
         updateStorageModeUi()
+        updateWanxiangModelSummary()
     }
 
     override fun onDestroy() {
@@ -385,6 +443,7 @@ class ProfileSettingsFragment : PaddingPreferenceFragment() {
     override fun onResume() {
         super.onResume()
         updateStorageModeUi()
+        updateWanxiangModelSummary()
         val ctx = requireContext()
         if (
             RimeDataSync.usesExternalSync(ctx) &&
@@ -393,5 +452,9 @@ class ProfileSettingsFragment : PaddingPreferenceFragment() {
         ) {
             ctx.toast(R.string.data_path_permission_revoked)
         }
+    }
+
+    private companion object {
+        const val WANXIANG_MODEL_PREFERENCE_KEY = "wanxiang_language_model"
     }
 }

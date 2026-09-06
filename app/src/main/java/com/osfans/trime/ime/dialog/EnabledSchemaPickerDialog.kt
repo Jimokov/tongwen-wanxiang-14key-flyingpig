@@ -9,6 +9,8 @@ import android.content.Context
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.osfans.trime.R
 import com.osfans.trime.core.RimeApi
+import com.osfans.trime.data.wanxiang.WanxiangLanguageModel
+import com.osfans.trime.util.toast
 import kotlinx.coroutines.launch
 import splitties.systemservices.inputMethodManager
 
@@ -36,7 +38,12 @@ object EnabledSchemaPickerDialog {
                         selectedIndex,
                     ) { dialog, which ->
                         scope.launch {
-                            rime.selectSchema(selectedIds[which])
+                            val schemaId = selectedIds[which]
+                            if (!WanxiangLanguageModel().canActivateSchema(schemaId)) {
+                                context.toast(R.string.wanxiang_model_not_ready)
+                                return@launch
+                            }
+                            rime.selectSchema(schemaId)
                             dialog.dismiss()
                         }
                     }

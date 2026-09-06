@@ -51,6 +51,14 @@
     <string name="show_app_icon">在启动器中显示图标</string>
     <string name="browse_app_data_dir">浏览应用数据文件夹</string>
     <string name="browse_app_data_dir_failed">没有可用的文件管理器浏览应用数据</string>
+    <string name="wanxiang_language_model">万象语言模型</string>
+    <string name="wanxiang_model_missing">未安装。请导入 wanxiang-lts-zh-hans.gram；它绝不会被打进应用或主题包。</string>
+    <string name="wanxiang_model_needs_deploy">已导入，须部署成功后才能使用万象。</string>
+    <string name="wanxiang_model_ready_summary">部署完成，可用（%1$d MB）</string>
+    <string name="wanxiang_model_deploy_failed">模型已导入，但上次部署失败；点此重新导入并部署。</string>
+    <string name="wanxiang_model_ready">万象语言模型已就绪</string>
+    <string name="wanxiang_model_import_failed">万象语言模型导入失败</string>
+    <string name="wanxiang_model_not_ready">万象语言模型导入并部署成功前，不能启用万象方案。</string>
     <string name="only_available_on_some_roms">此选项仅对部分 ROM 有效</string>
     <string name="default_">默认</string>
     <string name="clipboard_limit">剪贴板历史记录上限</string>

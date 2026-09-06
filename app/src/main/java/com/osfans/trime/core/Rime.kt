@@ -11,6 +11,7 @@ import com.osfans.trime.data.opencc.OpenCCDictManager
 import com.osfans.trime.data.prefs.AppPrefs
 import com.osfans.trime.data.sync.ExternalSyncFallback
 import com.osfans.trime.data.sync.RimeDataSync
+import com.osfans.trime.data.wanxiang.WanxiangLanguageModel
 import com.osfans.trime.ime.core.InlinePreeditMode
 import com.osfans.trime.util.appContext
 import kotlinx.coroutines.CompletableDeferred
@@ -135,6 +136,11 @@ class Rime :
                         deployFinished.await()
                     }
                 }
+            if (success) {
+                WanxiangLanguageModel().markDeploySuccess()
+            } else {
+                WanxiangLanguageModel().markDeployFailure()
+            }
             check(success) { "Rime deploy failed" }
         } finally {
             unregisterRimeMessageHandler(deployHandler)
@@ -255,7 +261,10 @@ class Rime :
 
     override suspend fun selectedSchemaId(): String = withRimeContext { getCurrentRimeSchema() }
 
-    override suspend fun selectSchema(schemaId: String) = withRimeContext { selectRimeSchema(schemaId) }
+    override suspend fun selectSchema(schemaId: String): Boolean {
+        if (!WanxiangLanguageModel().canActivateSchema(schemaId)) return false
+        return withRimeContext { selectRimeSchema(schemaId) }
+    }
 
     override suspend fun currentSchema(): RimeSchema = withRimeContext {
         RimeSchema(getCurrentRimeSchema())

@@ -33,6 +33,7 @@ class SyncPathPolicyTest :
         "preserve installation.yaml always" {
             SyncPathPolicy.shouldPreserveLocal("installation.yaml", "phone-a") shouldBe true
             SyncPathPolicy.shouldPreserveLocal("installation.yaml", null) shouldBe true
+            SyncPathPolicy.shouldPreserveLocal("wanxiang-lts-zh-hans.gram", "phone-a") shouldBe true
             SyncPathPolicy.shouldPreserveLocal("default.custom.yaml", "phone-a") shouldBe false
         }
         "preserve own sync folder when ownId is known" {
