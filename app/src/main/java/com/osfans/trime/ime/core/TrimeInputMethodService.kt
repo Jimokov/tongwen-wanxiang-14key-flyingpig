@@ -48,6 +48,7 @@ import com.osfans.trime.data.theme.ColorManager
 import com.osfans.trime.data.theme.ThemeManager
 import com.osfans.trime.data.theme.ThemeScope
 import com.osfans.trime.ime.composition.CandidatesView
+import com.osfans.trime.ime.keyboard.FourteenKeyRawCommandSession
 import com.osfans.trime.ime.keyboard.FourteenKeySelectionSession
 import com.osfans.trime.ime.keyboard.InputFeedbackManager
 import com.osfans.trime.receiver.RimeIntentReceiver
@@ -96,6 +97,7 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
     private var composingText: String = ""
 
     private val fourteenKeySelection = FourteenKeySelectionSession()
+    private val fourteenKeyRawCommand = FourteenKeyRawCommandSession()
 
     private var cursorUpdateIndex = 0
 
@@ -219,6 +221,9 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
                 if (!it.data.text.isNullOrEmpty()) {
                     commitText(it.data.text)
                     fourteenKeySelection.complete()?.let { returnKeyboard ->
+                        inputView?.switchKeyboard(returnKeyboard)
+                    }
+                    fourteenKeyRawCommand.complete()?.let { returnKeyboard ->
                         inputView?.switchKeyboard(returnKeyboard)
                     }
                 }
@@ -640,6 +645,37 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
             clearComposition()
             simulateKeySequence(snapshot.rawInput)
             inputView?.switchKeyboard(snapshot.returnKeyboard)
+        }
+    }
+
+    /**
+     * Starts a Wanxiang slash command in an unfurled 26-key layer.
+     *
+     * Slash commands deliberately start only from an empty composition.  This keeps
+     * `/rc` and `/flypy` unambiguous and prevents an unfinished Chinese composition
+     * from being silently replaced.
+     */
+    fun enterFourteenKeyRawCommand(
+        returnKeyboard: String,
+        commandKeyboard: String,
+    ) {
+        postRimeJob {
+            if (getRawInput().isNotEmpty()) return@postRimeJob
+            if (!fourteenKeyRawCommand.begin(returnKeyboard)) return@postRimeJob
+            if (simulateKeySequence("/")) {
+                inputView?.switchKeyboard(commandKeyboard)
+            } else {
+                fourteenKeyRawCommand.clear()
+            }
+        }
+    }
+
+    /** Removes the pending slash command without sending it to the target application. */
+    fun cancelFourteenKeyRawCommand() {
+        val returnKeyboard = fourteenKeyRawCommand.cancel() ?: return
+        postRimeJob {
+            clearComposition()
+            inputView?.switchKeyboard(returnKeyboard)
         }
     }
 

@@ -192,6 +192,9 @@ class CommonKeyboardActionListener(override val di: DI) : DIAware {
                     "enter_14key_selection" ->
                         service.enterFourteenKeySelection(currentKeyboardId(), arg)
                     "cancel_14key_selection" -> service.cancelFourteenKeySelection()
+                    "enter_14key_raw_command" ->
+                        service.enterFourteenKeyRawCommand(currentKeyboardId(), arg)
+                    "cancel_14key_raw_command" -> service.cancelFourteenKeyRawCommand()
                     "switch_hide_key_symbol" -> switchHideKeySymbol()
                     "switch_hide_key_hint" -> switchHideKeyHint()
                     else -> handleIntentAction(action.command, arg)
