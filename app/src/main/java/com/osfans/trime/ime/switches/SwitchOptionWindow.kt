@@ -24,6 +24,7 @@ import com.osfans.trime.ime.broadcast.InputBroadcastReceiver
 import com.osfans.trime.ime.core.TrimeInputMethodService
 import com.osfans.trime.ime.dialog.EnabledSchemaPickerDialog
 import com.osfans.trime.ime.keyboard.KeyboardWindow
+import com.osfans.trime.ime.keyboard.WanxiangKeyboardLayout
 import com.osfans.trime.ime.window.BoardWindow
 import com.osfans.trime.ime.window.BoardWindowManager
 import com.osfans.trime.ui.main.settings.ThemePickerDialog
@@ -51,14 +52,22 @@ class SwitchOptionWindow(di: DI) :
 
     private fun staticEntries(): List<SwitchOptionEntry.Static> = buildList {
         if (
-            keyboardWindow.currentKeyboardId().contains("14") &&
-            keyboardWindow.hasKeyboard(FOURTEEN_KEY_COMMAND_KEYBOARD)
+            keyboardWindow.currentKeyboardId().contains("14") && keyboardWindow.hasWanxiangLayoutControls()
         ) {
             add(
                 SwitchOptionEntry.Static(
                     "/ 命令",
                     R.drawable.ic_baseline_tune_24,
                     SwitchOptionEntry.Static.Type.RawCommand,
+                ),
+            )
+        }
+        if (keyboardWindow.hasWanxiangLayoutControls()) {
+            add(
+                SwitchOptionEntry.Static(
+                    "布局：${if (keyboardWindow.wanxiangLayout() == WanxiangKeyboardLayout.Fourteen) "十四键" else "全键"}",
+                    R.drawable.ic_baseline_keyboard_24,
+                    SwitchOptionEntry.Static.Type.WanxiangLayout,
                 ),
             )
         }
@@ -129,6 +138,24 @@ class SwitchOptionWindow(di: DI) :
                                 keyboardWindow.currentKeyboardId(),
                                 FOURTEEN_KEY_COMMAND_KEYBOARD,
                             )
+                        }
+                        SwitchOptionEntry.Static.Type.WanxiangLayout -> {
+                            val popup = PopupMenu(context, view)
+                            popup.menu.add("全键").setOnMenuItemClickListener {
+                                keyboardWindow.selectWanxiangLayout(WanxiangKeyboardLayout.Full)
+                                windowManager.attachWindow(KeyboardWindow)
+                                updateSchemaOptionEntries()
+                                true
+                            }
+                            popup.menu.add("十四键").setOnMenuItemClickListener {
+                                keyboardWindow.selectWanxiangLayout(WanxiangKeyboardLayout.Fourteen)
+                                windowManager.attachWindow(KeyboardWindow)
+                                updateSchemaOptionEntries()
+                                true
+                            }
+                            popupMenu?.dismiss()
+                            popupMenu = popup
+                            popup.show()
                         }
                         SwitchOptionEntry.Static.Type.SchemaList -> showDialog { r ->
                             EnabledSchemaPickerDialog.build(r, service.lifecycleScope, context) {

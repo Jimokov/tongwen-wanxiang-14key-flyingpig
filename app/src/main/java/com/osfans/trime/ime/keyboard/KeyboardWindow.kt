@@ -17,6 +17,7 @@ import com.osfans.trime.core.CompositionProto
 import com.osfans.trime.core.RimeMessage
 import com.osfans.trime.core.SchemaItem
 import com.osfans.trime.daemon.RimeSession
+import com.osfans.trime.data.prefs.AppPrefs
 import com.osfans.trime.data.theme.KeyActionManager
 import com.osfans.trime.data.theme.Theme
 import com.osfans.trime.data.theme.model.TextKeyboard
@@ -52,6 +53,7 @@ class KeyboardWindow(di: DI) :
     private val commonKeyboardActionListener: CommonKeyboardActionListener by instance()
     private val popup: PopupDelegate by instance()
     private val enterKeyDisplay: EnterKeyDisplayDelegate by instance()
+    private val prefs = AppPrefs.defaultInstance()
 
     private val cursorCapsMode: Int
         get() =
@@ -204,6 +206,7 @@ class KeyboardWindow(di: DI) :
     }
 
     private fun smartMatchKeyboard(): String {
+        preferredWanxiangKeyboard()?.let { return it }
         // 主题的布局中包含方案id，直接采用
         val currentSchema = rime.run { statusCached }.schemaId
         if (presetKeyboardIds.contains(currentSchema)) {
@@ -269,6 +272,25 @@ class KeyboardWindow(di: DI) :
     fun currentKeyboardId(): String = currentKeyboardId
 
     fun hasKeyboard(id: String): Boolean = presetKeyboardIds.contains(id)
+
+    fun hasWanxiangLayoutControls(): Boolean =
+        hasKeyboard(WanxiangKeyboardLayout.Fourteen.keyboardId) &&
+            hasKeyboard("wanxiang_14select") &&
+            hasKeyboard("wanxiang_14command")
+
+    fun wanxiangLayout(): WanxiangKeyboardLayout =
+        WanxiangKeyboardLayout.fromStoredValue(prefs.keyboard.wanxiangLayout.getValue())
+
+    fun selectWanxiangLayout(layout: WanxiangKeyboardLayout) {
+        if (!hasWanxiangLayoutControls()) return
+        prefs.keyboard.wanxiangLayout.setValue(layout.storedValue)
+        switchKeyboard(layout.keyboardId)
+    }
+
+    private fun preferredWanxiangKeyboard(): String? {
+        if (!hasWanxiangLayoutControls()) return null
+        return wanxiangLayout().keyboardId.takeIf(::hasKeyboard)
+    }
 
     fun refreshKeyboards(isAll: Boolean = false) {
         val id = currentKeyboardId.ifEmpty { return }
